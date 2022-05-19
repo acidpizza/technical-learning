@@ -1,0 +1,9 @@
+baseURL = 'https://acidpizza.github.io/technical-learning'
+languageCode = 'en-us'
+title = 'Technical Learning'
+theme = "docsy"
+
+[markup]
+  [markup.highlight]
+    # https://xyproto.github.io/splash/docs/longer/all.html
+    style = 'vs'
