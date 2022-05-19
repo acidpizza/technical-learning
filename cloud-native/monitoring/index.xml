@@ -1,0 +1,87 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Technical Learning – Monitoring</title><link>https://acidpizza.github.io/technical-learning/cloud-native/monitoring/</link><description>Recent content in Monitoring on Technical Learning</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><atom:link href="https://acidpizza.github.io/technical-learning/cloud-native/monitoring/index.xml" rel="self" type="application/rss+xml"/><item><title>Cloud-Native: Elasticsearch</title><link>https://acidpizza.github.io/technical-learning/cloud-native/monitoring/elasticsearch/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://acidpizza.github.io/technical-learning/cloud-native/monitoring/elasticsearch/</guid><description>
+&lt;h2 id="resources">Resources&lt;/h2>
+&lt;ul>
+&lt;li>&lt;a href="https://thoughts.t37.net/designing-the-perfect-elasticsearch-cluster-the-almost-definitive-guide-e614eabc1a87">https://thoughts.t37.net/designing-the-perfect-elasticsearch-cluster-the-almost-definitive-guide-e614eabc1a87&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h3 id="kibana">Kibana&lt;/h3>
+&lt;ul>
+&lt;li>&lt;a href="https://www.elastic.co/blog/visualizing-observability-with-kibana-event-rates-and-rate-of-change-in-tsvb">https://www.elastic.co/blog/visualizing-observability-with-kibana-event-rates-and-rate-of-change-in-tsvb&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://www.elastic.co/blog/timelion-tutorial-from-zero-to-hero">https://www.elastic.co/blog/timelion-tutorial-from-zero-to-hero&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://coralogix.com/log-analytics-blog/advanced-guide-to-kibana-timelion-functions/">https://coralogix.com/log-analytics-blog/advanced-guide-to-kibana-timelion-functions/&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="rest-api">REST API&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#008000"># curl&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -X PUT localhost:9200/_cluster/settings -H &lt;span style="color:#a31515">&amp;#39;Content-Type: application/json&amp;#39;&lt;/span> -d &lt;span style="color:#a31515">&amp;#39;{ json }&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#008000"># Remove replicas&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#008000"># Replace * with index name for specific index&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>PUT localhost:9200/*/_settings
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>{
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a31515">&amp;#34;index&amp;#34;&lt;/span> : {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a31515">&amp;#34;number_of_replicas&amp;#34;&lt;/span> : 0
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#008000"># Drain node&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>PUT localhost:9200/_cluster/settings
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>{
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a31515">&amp;#34;transient&amp;#34;&lt;/span> : {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a31515">&amp;#34;cluster.routing.allocation.exclude._ip&amp;#34;&lt;/span>: &lt;span style="color:#a31515">&amp;#34;x.x.x.x,y.y.y.y&amp;#34;&lt;/span>,
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a31515">&amp;#34;cluster.routing.allocation.node_concurrent_recoveries&amp;#34;&lt;/span>: &lt;span style="color:#a31515">&amp;#34;10&amp;#34;&lt;/span>,
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a31515">&amp;#34;cluster.routing.allocation.cluster_concurrent_rebalance&amp;#34;&lt;/span>: &lt;span style="color:#a31515">&amp;#34;10&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#008000"># Remove voting&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>POST localhost:9200/_cluster/voting_config_exclusions?node_names=xx,yy
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#008000"># View cluster status&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>GET localhost:9200/_cluster/health?pretty
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="downgrading-cluster-to-single-node">Downgrading Cluster to Single Node&lt;/h2>
+&lt;ol>
+&lt;li>Remove replicas&lt;/li>
+&lt;li>Drain nodes&lt;/li>
+&lt;li>Remove master nodes by adding to voting exclusion&lt;/li>
+&lt;li>Ensure es01 is the master (down other masters and bring up again if necessary)&lt;/li>
+&lt;/ol>
+&lt;blockquote>
+&lt;p>Hack: remove _state/ folder and lock file in data folder but keep the indices/ folder if nodes were deleted without properly removing voting rights.&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="reindex-to-change-field-mapping-type">Reindex to Change Field Mapping Type&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#008000"># Get index mapping&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -XGET localhost:9200/my-index-01/_mapping
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#008000"># Create new index&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -XPUT localhost:9200/my-index-01-reindex -H &lt;span style="color:#a31515">&amp;#39;Content-Type: application/json&amp;#39;&lt;/span> -d &lt;span style="color:#a31515">&amp;#39;{
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a31515"> &amp;#34;mappings&amp;#34;: {
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a31515"> XXX
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a31515"> }
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a31515">}&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#008000"># Create ingest pipeline&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -X PUT &lt;span style="color:#a31515">&amp;#34;localhost:9200/_ingest/pipeline/my-pipeline-id?pretty&amp;#34;&lt;/span> -H &lt;span style="color:#a31515">&amp;#39;Content-Type: application/json&amp;#39;&lt;/span> -d &lt;span style="color:#a31515">&amp;#39;{
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a31515"> &amp;#34;description&amp;#34; : &amp;#34;describe pipeline&amp;#34;,
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a31515"> &amp;#34;processors&amp;#34; : [
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a31515"> {
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a31515"> &amp;#34;convert&amp;#34; : {
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a31515"> &amp;#34;field&amp;#34;: &amp;#34;_source.field_name&amp;#34;,
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a31515"> &amp;#34;type&amp;#34;: &amp;#34;integer&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a31515"> }
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a31515"> }
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a31515"> ]
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a31515">}&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#008000"># Reindex&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>curl -XPOST localhost:9200/_reindex?pretty -H Content-Type:application/json -d &lt;span style="color:#a31515">&amp;#39;{
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a31515"> &amp;#34;source&amp;#34;: {
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a31515"> &amp;#34;index&amp;#34;: &amp;#34;my-index-01&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a31515"> },
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a31515"> &amp;#34;dest&amp;#34;: {
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a31515"> &amp;#34;index&amp;#34;: &amp;#34;my-index-01-reindex&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a31515"> }
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a31515"> &amp;#34;script&amp;#34;: {
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a31515"> &amp;#34;lang&amp;#34;: &amp;#34;painless&amp;#34;,
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a31515"> &amp;#34;source&amp;#34;: &amp;#34;if (ctx._source.request_content_length == \&amp;#34;-\&amp;#34; || ctx._source.request_content_length == \&amp;#34;UNKNOWN\&amp;#34;) {ctx._source.request_content_length = 0} if (ctx._source.response_content_length == \&amp;#34;-\&amp;#34; || ctx._source.response_content_length == \&amp;#34;UNKNOWN\&amp;#34;) {ctx._source.response_content_length = 0}&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a31515"> }
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a31515">}&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item></channel></rss>
