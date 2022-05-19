@@ -24,3 +24,11 @@ git submodule update --recursive
 
 hugo server
 ```
+
+# CI
+
+```bash
+# Get package-lock.json needed for CI
+docker run --rm -it -v /home/user/code/technical-learning:/code node:14 /bin/bash
+npm i --package-lock-only
+```
