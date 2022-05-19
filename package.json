@@ -1,0 +1,24 @@
+{
+  "name": "technical-learning",
+  "version": "0.0.1",
+  "description": "Learning",
+  "main": "none.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/acidpizza/technical-learning.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/acidpizza/technical-learning/issues"
+  },
+  "homepage": "https://github.com/acidpizza/technical-learning#readme",
+  "devDependencies": {
+    "autoprefixer": "^10.4.0",
+    "postcss": "^8.3.7",
+    "postcss-cli": "^9.0.2"
+  }
+}
