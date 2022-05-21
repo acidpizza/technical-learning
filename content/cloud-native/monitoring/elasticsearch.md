@@ -16,10 +16,15 @@ weight: 1
 ## REST API
 
 ```bash
-# curl
+# Curl format
 curl -X PUT localhost:9200/_cluster/settings -H 'Content-Type: application/json' -d '{ json }'
+```
 
-# Remove replicas
+
+## Downgrading Cluster to Single Node
+
+```bash
+# 1. Remove replicas
 # Replace * with index name for specific index
 PUT localhost:9200/*/_settings 
 { 
@@ -28,7 +33,7 @@ PUT localhost:9200/*/_settings
   } 
 }
 
-# Drain node
+# 2. Drain nodes (for IPs x.x.x.x and y.y.y.y)
 PUT localhost:9200/_cluster/settings 
 {
   "transient" : {
@@ -38,38 +43,33 @@ PUT localhost:9200/_cluster/settings
   }
 }
 
-# Remove voting
+# 3. Remove master nodes by adding to voting exclusion
+# Ensure es01 is the master (down other masters and bring up again if necessary)
 POST localhost:9200/_cluster/voting_config_exclusions?node_names=xx,yy 
 
 # View cluster status
 GET localhost:9200/_cluster/health?pretty
-
 ```
 
-## Downgrading Cluster to Single Node
-
-1. Remove replicas
-2. Drain nodes
-3. Remove master nodes by adding to voting exclusion
-4. Ensure es01 is the master (down other masters and bring up again if necessary)
-
-> Hack: remove _state/ folder and lock file in data folder but keep the indices/ folder if nodes were deleted without properly removing voting rights.
+**Hack:** remove _state/ folder and lock file in data folder but keep the indices/ folder if nodes were deleted without properly removing voting rights.
 
 
 ## Reindex to Change Field Mapping Type
 
+Reindex from `my-index-01` to `my-index-01-reindex`.
+
 ```bash
-# Get index mapping
+# 1. Get index mapping
 curl -XGET localhost:9200/my-index-01/_mapping
 
-# Create new index
+# 2. Create new index
 curl -XPUT localhost:9200/my-index-01-reindex -H 'Content-Type: application/json' -d '{
   "mappings": {
     XXX
   }
 }'
 
-# Create ingest pipeline
+# 3. Create ingest pipeline
 curl -X PUT "localhost:9200/_ingest/pipeline/my-pipeline-id?pretty" -H 'Content-Type: application/json' -d '{
   "description" : "describe pipeline",
   "processors" : [
@@ -82,7 +82,7 @@ curl -X PUT "localhost:9200/_ingest/pipeline/my-pipeline-id?pretty" -H 'Content-
   ]
 }'
 
-# Reindex
+# 4. Reindex
 curl -XPOST localhost:9200/_reindex?pretty -H Content-Type:application/json -d '{
   "source": {
     "index": "my-index-01"

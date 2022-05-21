@@ -7,3 +7,11 @@ theme = "docsy"
   [markup.highlight]
     # https://xyproto.github.io/splash/docs/longer/all.html
     style = 'vs'
+
+[markup.goldmark]
+  [markup.goldmark.renderer]
+  # Allow multiline in tables with <br>
+  unsafe = true 
+
+# Enable syntax highlighting and copy buttons on code blocks with Prism
+# prism_syntax_highlighting = true
